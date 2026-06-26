@@ -1,14 +1,14 @@
 ---
-title: "feat: Rust 数据库 GUI 客户端 (simpl-datasource-client) 全量实现规划"
+title: "feat: 简源 (SimplSource) Rust 数据库 GUI 客户端全量实现规划"
 type: feat
 date: 2026-06-26
 ---
 
-# feat: Rust 数据库 GUI 客户端 (simpl-datasource-client) 全量实现规划
+# feat: 简源 (SimplSource) Rust 数据库 GUI 客户端全量实现规划
 
 ## Summary
 
-在空仓库 `simpl-datasource-client` 中，以 **Tauri 2 + React + Rust 驱动核心** 构建跨平台数据库 GUI 客户端。产品目标是对标并覆盖 DBeaver、Beekeeper Studio、DbGate、TablePlus、HeidiSQL、DataGrip 等同类工具的核心能力，并通过 **中文优先体验、Rust 原生轻量、ORM 连接发现、MCP/AI 集成、Core/GUI 分离** 形成差异化。交付采用分阶段路线图：先落地 PG/MySQL/SQLite 可用 MVP，再补齐 Schema/ER/导入导出/SSH 等高级能力，最后扩展差异化与多数据库支持。
+在空仓库 `simpl-datasource-client` 中，以产品名 **简源**（英文标识 **SimplSource**）构建跨平台数据库 GUI 客户端，技术栈为 **Tauri 2 + React + Rust 驱动核心**。产品目标是对标并覆盖 DBeaver、Beekeeper Studio、DbGate、TablePlus、HeidiSQL、DataGrip 等同类工具的核心能力，并通过 **中文优先体验、Rust 原生轻量、ORM 连接发现、MCP/AI 集成、Core/GUI 分离** 形成差异化。交付采用分阶段路线图：先落地 PG/MySQL/SQLite 可用 MVP，再补齐 Schema/ER/导入导出/SSH 等高级能力，最后扩展差异化与多数据库支持。
 
 ## Problem Frame
 
@@ -813,10 +813,26 @@ simpl-datasource-client/
 
 ---
 
+## Product Identity
+
+| 字段 | 值 |
+| --- | --- |
+| 中文产品名 | **简源** |
+| 英文标识 | **SimplSource** |
+| 一句话定位 | 轻量、原生、中文优先的数据库客户端 |
+| 仓库/包名 | `simpl-datasource-client`（技术名不变） |
+| Tauri 应用标识 | `com.simplsource.app`（U1 初始化时写入） |
+| 窗口标题示例 | `简源 — SimplSource` |
+
+**命名理由：** 「简」对应 simpl（简单、轻量）；「源」对应 datasource（数据源）。两字易记、偏开发者气质，且不与现有主流客户端撞名。
+
+---
+
 ## Assumptions
 
-- 用户接受 **Tauri + React** 作为主技术路线，而非 100% 纯 Rust UI（egui 可作为远期分支）。
-- MVP 首发数据库为 **PostgreSQL、MySQL、SQLite**；MSSQL/NoSQL 按 Phase 2–4 交付。
+- **已确认：** **Tauri + React** 作为主技术路线（egui 仅作远期 lite 分支）。
+- **已确认：** MVP 首发 **PostgreSQL、MySQL、SQLite**；MSSQL/NoSQL 按 Phase 2–4 交付。
+- **已确认：** 用户可见产品名为 **简源 / SimplSource**；仓库名保持 `simpl-datasource-client`。
 - 无需 Cloud/Web 自托管版作为首版交付物。
 - 许可证采用 **MIT**，与当前 LICENSE 文件一致（实施时需确认/统一）。
 - 用户未要求独立产品网站；文档以 README + 内嵌帮助为主。
@@ -825,6 +841,5 @@ simpl-datasource-client/
 
 ## Open Questions
 
-1. **产品命名：** 仓库名 `simpl-datasource-client` 是否作为用户可见应用名，还是另取品牌名（如「简源」）？—— 默认使用仓库名，可在 U10 前定稿。
-2. **AI 默认 Provider：** 是否预置 Ollama 本地检测作为零配置入门？—— 建议 U18 实现可选检测，不预置云端 Key。
-3. **安装包分发：** GitHub Releases only，还是同步 Homebrew/Scoop？—— 建议 Phase 1 末提供 GitHub Releases，包管理器后续跟进。
+1. **AI 默认 Provider：** 是否预置 Ollama 本地检测作为零配置入门？—— 建议 U18 实现可选检测，不预置云端 Key。
+2. **安装包分发：** GitHub Releases only，还是同步 Homebrew/Scoop？—— 建议 Phase 1 末提供 GitHub Releases，包管理器后续跟进。
