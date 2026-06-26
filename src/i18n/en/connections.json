@@ -1,0 +1,31 @@
+{
+  "newConnection": "New Connection",
+  "editConnection": "Edit Connection",
+  "connectionName": "Name",
+  "databaseType": "Database",
+  "host": "Host",
+  "port": "Port",
+  "database": "Database / file path",
+  "username": "Username",
+  "password": "Password",
+  "readOnly": "Read only",
+  "test": "Test",
+  "save": "Save",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "deleteConfirm": "Delete this connection?",
+  "testSuccess": "Connected",
+  "testFailed": "Connection failed",
+  "sshSection": "SSH tunnel",
+  "sshEnabled": "Enable SSH",
+  "sshHost": "SSH host",
+  "sshPort": "SSH port",
+  "sshUsername": "SSH username",
+  "sshPrivateKey": "Private key path (optional)",
+  "sshPassword": "SSH password / key passphrase",
+  "environments": {
+    "dev": "Dev",
+    "staging": "Staging",
+    "prod": "Prod"
+  }
+}

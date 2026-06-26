@@ -1,0 +1,29 @@
+[package]
+name = "simplsource"
+version.workspace = true
+description = "简源 SimplSource — 轻量数据库客户端"
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lib]
+name = "simplsource_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+simpl-datasource-core = { path = "../crates/core" }
+simpl-driver-trait = { path = "../crates/driver-trait" }
+tauri = { version = "2", features = [] }
+tauri-plugin-shell = "2"
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+uuid.workspace = true
+rfd = "0.15"

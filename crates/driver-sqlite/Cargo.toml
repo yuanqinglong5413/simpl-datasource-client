@@ -1,0 +1,14 @@
+[package]
+name = "simpl-driver-sqlite"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+async-trait.workspace = true
+chrono.workspace = true
+rust_decimal.workspace = true
+serde_json.workspace = true
+sqlx = { workspace = true, features = ["runtime-tokio", "sqlite", "chrono", "rust_decimal", "json"] }
+simpl-driver-trait = { path = "../driver-trait" }
+tokio.workspace = true
