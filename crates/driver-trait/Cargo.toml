@@ -1,0 +1,17 @@
+[package]
+name = "simpl-driver-trait"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "简源数据库客户端 — 驱动抽象与共享类型"
+
+[dependencies]
+async-trait.workspace = true
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true

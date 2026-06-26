@@ -21,6 +21,27 @@
 - 后端：Rust + Tokio + sqlx
 - MVP 数据库：PostgreSQL、MySQL、SQLite
 
+## 本地开发
+
+环境要求：Rust stable、Node 20+、Linux 需 `libwebkit2gtk-4.1-dev` 等 Tauri 依赖。
+
+```bash
+npm install
+npm run tauri dev
+```
+
+仅前端热更新：
+
+```bash
+npm run dev
+```
+
+Rust 测试：
+
+```bash
+cargo test --workspace
+```
+
 ## 规划文档
 
 完整实现规划见 [`docs/plans/2026-06-26-001-feat-rust-db-gui-client-plan.md`](docs/plans/2026-06-26-001-feat-rust-db-gui-client-plan.md)。

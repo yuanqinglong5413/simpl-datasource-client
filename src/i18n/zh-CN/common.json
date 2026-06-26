@@ -1,0 +1,21 @@
+{
+  "appName": "简源",
+  "appSubtitle": "SimplSource",
+  "tagline": "轻量、原生、中文优先的数据库客户端",
+  "pingOk": "后端已连接",
+  "pingFail": "后端未响应",
+  "emptyConnections": "暂无连接，点击「新建连接」开始",
+  "schema": "结构",
+  "editor": "查询",
+  "data": "数据",
+  "refresh": "刷新",
+  "execute": "执行",
+  "connect": "连接",
+  "disconnect": "断开",
+  "loading": "加载中…",
+  "error": "错误",
+  "rows": "行",
+  "ms": "毫秒",
+  "noConnectionSelected": "请先选择并连接数据库",
+  "selectTableHint": "在左侧选择表以浏览数据"
+}

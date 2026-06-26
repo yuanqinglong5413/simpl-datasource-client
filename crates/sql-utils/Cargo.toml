@@ -1,0 +1,13 @@
+[package]
+name = "simpl-sql-utils"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "简源 — SQL 解析与格式化工具"
+
+[dependencies]
+sqlparser.workspace = true
+simpl-driver-trait = { path = "../driver-trait" }
+
+[dev-dependencies]
+serde_json.workspace = true

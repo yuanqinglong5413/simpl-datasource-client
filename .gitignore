@@ -1,0 +1,27 @@
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# Node
+node_modules/
+dist/
+
+# Tauri
+src-tauri/target/
+src-tauri/gen/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# App data (local dev)
+.simplsource/
+
+# SQLx offline (future)
+.sqlx/

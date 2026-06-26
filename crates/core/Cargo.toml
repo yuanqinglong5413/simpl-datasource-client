@@ -1,0 +1,25 @@
+[package]
+name = "simpl-datasource-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "简源 — 连接管理、查询引擎与 Schema 缓存"
+
+[dependencies]
+async-trait.workspace = true
+chrono.workspace = true
+simpl-credential = { path = "../credential" }
+simpl-driver-mysql = { path = "../driver-mysql" }
+simpl-driver-postgres = { path = "../driver-postgres" }
+simpl-driver-sqlite = { path = "../driver-sqlite" }
+simpl-driver-trait = { path = "../driver-trait" }
+simpl-sql-utils = { path = "../sql-utils" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+uuid.workspace = true
+dirs = "6"
+
+[dev-dependencies]
+tempfile = "3"

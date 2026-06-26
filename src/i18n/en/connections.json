@@ -1,0 +1,24 @@
+{
+  "newConnection": "New Connection",
+  "editConnection": "Edit Connection",
+  "connectionName": "Name",
+  "databaseType": "Database",
+  "host": "Host",
+  "port": "Port",
+  "database": "Database / file path",
+  "username": "Username",
+  "password": "Password",
+  "readOnly": "Read only",
+  "test": "Test",
+  "save": "Save",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "deleteConfirm": "Delete this connection?",
+  "testSuccess": "Connected",
+  "testFailed": "Connection failed",
+  "environments": {
+    "dev": "Dev",
+    "staging": "Staging",
+    "prod": "Prod"
+  }
+}

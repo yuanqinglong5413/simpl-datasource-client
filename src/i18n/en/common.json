@@ -1,0 +1,21 @@
+{
+  "appName": "SimplSource",
+  "appSubtitle": "简源",
+  "tagline": "Lightweight, native database client",
+  "pingOk": "Backend connected",
+  "pingFail": "Backend unreachable",
+  "emptyConnections": "No connections yet. Click New Connection to start.",
+  "schema": "Schema",
+  "editor": "Query",
+  "data": "Data",
+  "refresh": "Refresh",
+  "execute": "Run",
+  "connect": "Connect",
+  "disconnect": "Disconnect",
+  "loading": "Loading…",
+  "error": "Error",
+  "rows": "rows",
+  "ms": "ms",
+  "noConnectionSelected": "Select and connect to a database first",
+  "selectTableHint": "Select a table on the left to browse data"
+}
