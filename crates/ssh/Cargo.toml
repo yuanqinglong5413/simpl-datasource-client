@@ -7,7 +7,7 @@ description = "简源 — SSH 本地端口转发隧道"
 
 [dependencies]
 simpl-driver-trait = { path = "../driver-trait" }
-ssh2 = "0.9"
+ssh2 = { version = "0.9", features = ["vendored-openssl"] }
 thiserror.workspace = true
 tokio.workspace = true
 tracing.workspace = true
