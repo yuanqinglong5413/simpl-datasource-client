@@ -1,5 +1,5 @@
-use simpl_driver_trait::{CellValue, ColumnMeta, RowPage};
 use serde::{Deserialize, Serialize};
+use simpl_driver_trait::{CellValue, ColumnMeta, RowPage};
 use std::fs::File;
 use std::path::Path;
 
@@ -28,7 +28,11 @@ pub struct ExportResult {
 }
 
 /// 将分页数据导出到文件。
-pub fn export_row_page(page: &RowPage, format: ExportFormat, path: &Path) -> Result<ExportResult, String> {
+pub fn export_row_page(
+    page: &RowPage,
+    format: ExportFormat,
+    path: &Path,
+) -> Result<ExportResult, String> {
     match format {
         ExportFormat::Csv => export_csv(page, path),
         ExportFormat::Json => export_json(page, path, false),
@@ -155,14 +159,17 @@ fn write_cell(
         }
         CellValue::Json(v) => {
             worksheet
-                .write_string(row, col, &v.to_string())
+                .write_string(row, col, v.to_string())
                 .map_err(|e| e.to_string())?;
             Ok(())
         }
     }
 }
 
-fn row_to_object(columns: &[ColumnMeta], row: &[CellValue]) -> serde_json::Map<String, serde_json::Value> {
+fn row_to_object(
+    columns: &[ColumnMeta],
+    row: &[CellValue],
+) -> serde_json::Map<String, serde_json::Value> {
     let mut map = serde_json::Map::new();
     for (idx, col) in columns.iter().enumerate() {
         let val = row.get(idx).cloned().unwrap_or(CellValue::Null);

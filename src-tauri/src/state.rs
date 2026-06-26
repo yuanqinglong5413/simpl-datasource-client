@@ -1,6 +1,4 @@
-use simpl_datasource_core::{
-    ConnectionManager, QueryEngine, QueryHistoryStore, SchemaCache,
-};
+use simpl_datasource_core::{ConnectionManager, QueryEngine, QueryHistoryStore, SchemaCache};
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
@@ -18,10 +16,7 @@ impl AppState {
     pub fn new(data_dir: std::path::PathBuf) -> Self {
         let connections = Arc::new(ConnectionManager::new(&data_dir));
         let schema_cache = Arc::new(SchemaCache::new());
-        let query_engine = Arc::new(QueryEngine::new(
-            connections.clone(),
-            schema_cache.clone(),
-        ));
+        let query_engine = Arc::new(QueryEngine::new(connections.clone(), schema_cache.clone()));
         let history = Arc::new(QueryHistoryStore::new(&data_dir));
         Self {
             connections,

@@ -1,7 +1,7 @@
 use crate::convert::{columns_from_row, row_to_cells};
 use async_trait::async_trait;
 use simpl_driver_trait::{
-    ConnectionConfig, ConnectionSecrets, DatabaseKind, DriverError, Dialect, ExecuteResult,
+    ConnectionConfig, ConnectionSecrets, DatabaseKind, Dialect, DriverError, ExecuteResult,
     ExplainPlan, ExplainRow, RowPage, SchemaMeta, SqlDriver, TableMeta, TablePageRequest,
 };
 use sqlx::postgres::{PgPool, PgPoolOptions, PgRow};
@@ -127,21 +127,26 @@ impl SqlDriver for PostgresDriver {
 
             let col_meta: Vec<simpl_driver_trait::ColumnMeta> = columns
                 .into_iter()
-                .map(|(name, data_type, nullable)| simpl_driver_trait::ColumnMeta {
-                    name: name.clone(),
-                    data_type,
-                    nullable: nullable == "YES",
-                    is_primary_key: pk_cols.contains(&name),
-                })
+                .map(
+                    |(name, data_type, nullable)| simpl_driver_trait::ColumnMeta {
+                        name: name.clone(),
+                        data_type,
+                        nullable: nullable == "YES",
+                        is_primary_key: pk_cols.contains(&name),
+                    },
+                )
                 .collect();
 
-            schema_map.entry(schema.clone()).or_default().push(TableMeta {
-                schema: schema.clone(),
-                name: table,
-                columns: col_meta,
-                primary_key: pk_cols,
-                row_count: None,
-            });
+            schema_map
+                .entry(schema.clone())
+                .or_default()
+                .push(TableMeta {
+                    schema: schema.clone(),
+                    name: table,
+                    columns: col_meta,
+                    primary_key: pk_cols,
+                    row_count: None,
+                });
         }
 
         let schemas = schema_map
@@ -191,12 +196,8 @@ impl SqlDriver for PostgresDriver {
             .await
             .map_err(Self::map_query_error)?;
 
-        let columns = rows
-            .first()
-            .map(columns_from_row)
-            .unwrap_or_default();
-        let data: Vec<Vec<simpl_driver_trait::CellValue>> =
-            rows.iter().map(row_to_cells).collect();
+        let columns = rows.first().map(columns_from_row).unwrap_or_default();
+        let data: Vec<Vec<simpl_driver_trait::CellValue>> = rows.iter().map(row_to_cells).collect();
         let count = data.len() as u64;
 
         Ok(ExecuteResult {
@@ -224,10 +225,7 @@ impl SqlDriver for PostgresDriver {
             .fetch_all(&self.pool)
             .await
             .map_err(Self::map_query_error)?;
-        let columns = rows
-            .first()
-            .map(columns_from_row)
-            .unwrap_or_default();
+        let columns = rows.first().map(columns_from_row).unwrap_or_default();
         Ok(RowPage {
             columns,
             rows: rows.iter().map(row_to_cells).collect(),
@@ -247,7 +245,10 @@ impl SqlDriver for PostgresDriver {
             .map(|row| {
                 let plan: String = row.try_get(0).unwrap_or_default();
                 ExplainRow {
-                    fields: vec![("QUERY PLAN".into(), simpl_driver_trait::CellValue::String(plan))],
+                    fields: vec![(
+                        "QUERY PLAN".into(),
+                        simpl_driver_trait::CellValue::String(plan),
+                    )],
                 }
             })
             .collect();

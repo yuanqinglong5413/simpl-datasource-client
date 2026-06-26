@@ -2,7 +2,9 @@ use crate::connect_resolve::ResolvedConnection;
 use crate::dml_generator::{generate_update, CellChangeRequest, DmlPreview};
 use crate::driver_registry::ActiveDriver;
 use crate::export::{export_row_page, ExportFormat, ExportResult};
-use crate::import::{build_import_sql, preview_import, ImportFileFormat, ImportPreview, ImportRequest, ImportResult};
+use crate::import::{
+    build_import_sql, preview_import, ImportFileFormat, ImportPreview, ImportRequest, ImportResult,
+};
 use crate::persistence::{ConnectionPersistence, PersistenceError};
 use crate::transaction_manager::{TransactionManager, TransactionStatus};
 use simpl_credential::CredentialStore;
@@ -142,18 +144,9 @@ impl ConnectionManager {
         ssh_password: Option<String>,
     ) -> ConnectionSecrets {
         ConnectionSecrets {
-            password: password.or_else(|| {
-                self.credentials
-                    .get_secret(&config.id)
-                    .ok()
-                    .flatten()
-            }),
-            ssh_password: ssh_password.or_else(|| {
-                self.credentials
-                    .get_ssh_secret(&config.id)
-                    .ok()
-                    .flatten()
-            }),
+            password: password.or_else(|| self.credentials.get_secret(&config.id).ok().flatten()),
+            ssh_password: ssh_password
+                .or_else(|| self.credentials.get_ssh_secret(&config.id).ok().flatten()),
         }
     }
 
@@ -162,11 +155,12 @@ impl ConnectionManager {
         config: &ConnectionConfig,
         secrets: &ConnectionSecrets,
     ) -> Result<ActiveConnection, DriverErrorResponse> {
-        let resolved = ResolvedConnection::resolve(config, secrets).map_err(|e| DriverErrorResponse {
-            code: "ssh_failed".into(),
-            user_message: format!("SSH 隧道建立失败：{e}"),
-            detail: Some(e.to_string()),
-        })?;
+        let resolved =
+            ResolvedConnection::resolve(config, secrets).map_err(|e| DriverErrorResponse {
+                code: "ssh_failed".into(),
+                user_message: format!("SSH 隧道建立失败：{e}"),
+                detail: Some(e.to_string()),
+            })?;
         let driver = ActiveDriver::connect(config, secrets, &resolved.host, resolved.port)
             .await
             .map_err(DriverErrorResponse::from)?;
@@ -189,14 +183,11 @@ impl ConnectionManager {
     }
 
     pub async fn connect(&self, id: &Uuid) -> Result<ConnectionConfig, DriverErrorResponse> {
-        let config = self
-            .persistence
-            .get(id)
-            .map_err(|_| DriverErrorResponse {
-                code: "not_found".into(),
-                user_message: "连接不存在".into(),
-                detail: None,
-            })?;
+        let config = self.persistence.get(id).map_err(|_| DriverErrorResponse {
+            code: "not_found".into(),
+            user_message: "连接不存在".into(),
+            detail: None,
+        })?;
         let secrets = self.build_secrets(&config, None, None);
         let conn = self.open_driver(&config, &secrets).await?;
         conn.driver
@@ -213,8 +204,10 @@ impl ConnectionManager {
     }
 
     pub async fn introspect(&self, id: &Uuid) -> Result<SchemaMeta, DriverErrorResponse> {
-        self.with_driver(id, |driver| Box::pin(async move { driver.introspect().await }))
-            .await
+        self.with_driver(id, |driver| {
+            Box::pin(async move { driver.introspect().await })
+        })
+        .await
     }
 
     pub async fn fetch_table_page(
@@ -235,9 +228,7 @@ impl ConnectionManager {
         change: CellChangeRequest,
     ) -> Result<DmlPreview, DriverErrorResponse> {
         let dialect = self
-            .with_driver(id, |driver| {
-                Box::pin(async move { Ok(driver.dialect()) })
-            })
+            .with_driver(id, |driver| Box::pin(async move { Ok(driver.dialect()) }))
             .await?;
         generate_update(dialect, &change).map_err(|e| DriverErrorResponse {
             code: "invalid_change".into(),
@@ -325,13 +316,7 @@ impl ConnectionManager {
             .iter()
             .flat_map(|db| db.schemas.iter())
             .flat_map(|sch| sch.tables.iter())
-            .find(|t| {
-                t.name == table
-                    && schema
-                        .as_ref()
-                        .map(|s| &t.schema == s)
-                        .unwrap_or(true)
-            })
+            .find(|t| t.name == table && schema.as_ref().map(|s| &t.schema == s).unwrap_or(true))
             .map(|t| t.columns.clone())
             .unwrap_or_default();
         preview_import(path, format, &columns).map_err(|e| DriverErrorResponse {
@@ -366,7 +351,8 @@ impl ConnectionManager {
     where
         F: for<'a> FnOnce(
             &'a ActiveDriver,
-        ) -> Pin<Box<dyn Future<Output = Result<T, DriverError>> + Send + 'a>>,
+        )
+            -> Pin<Box<dyn Future<Output = Result<T, DriverError>> + Send + 'a>>,
     {
         let active = self.active.read().await;
         let conn = active.get(id).ok_or(DriverErrorResponse {

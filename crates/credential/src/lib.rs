@@ -74,7 +74,11 @@ impl CredentialStore {
     }
 
     /// 保存 SSH 密码。
-    pub fn store_ssh_secret(&self, connection_id: &Uuid, secret: &str) -> Result<(), CredentialError> {
+    pub fn store_ssh_secret(
+        &self,
+        connection_id: &Uuid,
+        secret: &str,
+    ) -> Result<(), CredentialError> {
         self.store_with_key(
             &Self::ssh_keyring_key(connection_id),
             connection_id,
@@ -113,11 +117,7 @@ impl CredentialStore {
 
     /// 读取 SSH 密码。
     pub fn get_ssh_secret(&self, connection_id: &Uuid) -> Result<Option<String>, CredentialError> {
-        self.get_with_key(
-            &Self::ssh_keyring_key(connection_id),
-            connection_id,
-            true,
-        )
+        self.get_with_key(&Self::ssh_keyring_key(connection_id), connection_id, true)
     }
 
     fn get_with_key(
@@ -150,11 +150,7 @@ impl CredentialStore {
 
     /// 删除 SSH 密码。
     pub fn delete_ssh_secret(&self, connection_id: &Uuid) -> Result<(), CredentialError> {
-        self.delete_with_key(
-            &Self::ssh_keyring_key(connection_id),
-            connection_id,
-            true,
-        )
+        self.delete_with_key(&Self::ssh_keyring_key(connection_id), connection_id, true)
     }
 
     fn delete_with_key(
@@ -220,7 +216,8 @@ impl CredentialStore {
     }
 
     fn save_all_encrypted(&self, payload: &SecretsPayload) -> Result<(), CredentialError> {
-        let plain = serde_json::to_vec(payload).map_err(|e| CredentialError::Write(e.to_string()))?;
+        let plain =
+            serde_json::to_vec(payload).map_err(|e| CredentialError::Write(e.to_string()))?;
         let mut nonce_bytes = [0u8; 12];
         OsRng.fill_bytes(&mut nonce_bytes);
         let cipher = Aes256Gcm::new_from_slice(&self.derive_key())

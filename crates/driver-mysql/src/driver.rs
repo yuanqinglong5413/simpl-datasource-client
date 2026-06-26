@@ -1,7 +1,7 @@
 use crate::convert::{columns_from_row, row_to_cells};
 use async_trait::async_trait;
 use simpl_driver_trait::{
-    ConnectionConfig, ConnectionSecrets, DatabaseKind, DriverError, Dialect, ExecuteResult,
+    ConnectionConfig, ConnectionSecrets, DatabaseKind, Dialect, DriverError, ExecuteResult,
     ExplainPlan, ExplainRow, RowPage, SchemaMeta, SqlDriver, TableMeta, TablePageRequest,
 };
 use sqlx::mysql::{MySqlPool, MySqlPoolOptions, MySqlRow};
@@ -99,12 +99,14 @@ impl SqlDriver for MysqlDriver {
 
             let col_meta = columns
                 .into_iter()
-                .map(|(name, data_type, nullable)| simpl_driver_trait::ColumnMeta {
-                    name: name.clone(),
-                    data_type,
-                    nullable: nullable == "YES",
-                    is_primary_key: false,
-                })
+                .map(
+                    |(name, data_type, nullable)| simpl_driver_trait::ColumnMeta {
+                        name: name.clone(),
+                        data_type,
+                        nullable: nullable == "YES",
+                        is_primary_key: false,
+                    },
+                )
                 .collect();
 
             table_metas.push(TableMeta {
@@ -158,8 +160,7 @@ impl SqlDriver for MysqlDriver {
             .await
             .map_err(Self::map_err)?;
         let columns = rows.first().map(columns_from_row).unwrap_or_default();
-        let data: Vec<Vec<simpl_driver_trait::CellValue>> =
-            rows.iter().map(row_to_cells).collect();
+        let data: Vec<Vec<simpl_driver_trait::CellValue>> = rows.iter().map(row_to_cells).collect();
 
         Ok(ExecuteResult {
             columns,
@@ -203,7 +204,10 @@ impl SqlDriver for MysqlDriver {
                 let mut fields = Vec::new();
                 for (idx, col) in row.columns().iter().enumerate() {
                     let val: String = row.try_get(idx).unwrap_or_default();
-                    fields.push((col.name().to_string(), simpl_driver_trait::CellValue::String(val)));
+                    fields.push((
+                        col.name().to_string(),
+                        simpl_driver_trait::CellValue::String(val),
+                    ));
                 }
                 let _ = i;
                 ExplainRow { fields }

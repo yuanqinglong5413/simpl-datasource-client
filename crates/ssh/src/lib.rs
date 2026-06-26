@@ -43,10 +43,8 @@ impl SshTunnel {
 
         let tcp = TcpStream::connect(format!("{}:{}", ssh.host, ssh.port))
             .map_err(|e| SshError::Connect(format!("无法连接 SSH 服务器：{e}")))?;
-        tcp.set_read_timeout(Some(Duration::from_secs(30)))
-            .ok();
-        tcp.set_write_timeout(Some(Duration::from_secs(30)))
-            .ok();
+        tcp.set_read_timeout(Some(Duration::from_secs(30))).ok();
+        tcp.set_write_timeout(Some(Duration::from_secs(30))).ok();
 
         let mut sess = Session::new().map_err(|e| SshError::Connect(e.to_string()))?;
         sess.set_tcp_stream(tcp);
@@ -102,7 +100,8 @@ impl SshTunnel {
                         let session = session.clone();
                         let host = target_host.clone();
                         thread::spawn(move || {
-                            if let Err(e) = forward_connection(session, &host, target_port, &mut local)
+                            if let Err(e) =
+                                forward_connection(session, &host, target_port, &mut local)
                             {
                                 tracing::debug!("ssh forward ended: {e}");
                             }
@@ -133,8 +132,7 @@ impl SshTunnel {
 
 impl Drop for SshTunnel {
     fn drop(&mut self) {
-        self.stop
-            .store(true, std::sync::atomic::Ordering::Relaxed);
+        self.stop.store(true, std::sync::atomic::Ordering::Relaxed);
         if let Some(handle) = self.thread.take() {
             let _ = handle.join();
         }

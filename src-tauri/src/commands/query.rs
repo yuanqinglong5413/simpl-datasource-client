@@ -54,7 +54,5 @@ pub async fn list_query_history(
     connection_id: Option<Uuid>,
     limit: Option<usize>,
 ) -> Result<Vec<QueryHistoryEntry>, String> {
-    Ok(state
-        .history
-        .list(connection_id, limit.unwrap_or(50)))
+    Ok(state.history.list(connection_id, limit.unwrap_or(50)))
 }

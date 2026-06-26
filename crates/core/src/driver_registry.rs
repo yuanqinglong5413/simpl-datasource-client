@@ -3,7 +3,7 @@ use simpl_driver_mysql::MysqlDriver;
 use simpl_driver_postgres::PostgresDriver;
 use simpl_driver_sqlite::SqliteDriver;
 use simpl_driver_trait::{
-    ConnectionConfig, ConnectionSecrets, DatabaseKind, DriverError, Dialect, ExecuteResult,
+    ConnectionConfig, ConnectionSecrets, DatabaseKind, Dialect, DriverError, ExecuteResult,
     ExplainPlan, RowPage, SchemaMeta, SqlDriver, TablePageRequest,
 };
 

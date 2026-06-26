@@ -1,5 +1,5 @@
-use simpl_driver_trait::ColumnMeta;
 use serde::{Deserialize, Serialize};
+use simpl_driver_trait::ColumnMeta;
 use std::collections::HashMap;
 use std::path::Path;
 

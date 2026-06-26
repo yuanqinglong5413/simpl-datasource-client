@@ -6,15 +6,11 @@ pub fn row_to_cells(row: &sqlx::sqlite::SqliteRow) -> Vec<CellValue> {
 }
 
 fn sqlite_cell_at(row: &sqlx::sqlite::SqliteRow, index: usize) -> CellValue {
-    if let Ok(v) = row.try_get::<Option<i64>, _>(index) {
-        if let Some(n) = v {
-            return CellValue::Int64(n);
-        }
+    if let Ok(Some(n)) = row.try_get::<Option<i64>, _>(index) {
+        return CellValue::Int64(n);
     }
-    if let Ok(v) = row.try_get::<Option<f64>, _>(index) {
-        if let Some(n) = v {
-            return CellValue::Float64(n);
-        }
+    if let Ok(Some(n)) = row.try_get::<Option<f64>, _>(index) {
+        return CellValue::Float64(n);
     }
     if let Ok(v) = row.try_get::<Option<String>, _>(index) {
         return match v {

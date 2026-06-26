@@ -1,6 +1,8 @@
 use crate::connection_manager::ConnectionManager;
 use crate::schema_cache::SchemaCache;
-use simpl_driver_trait::{DriverErrorResponse, ExecuteResult, ExplainPlan, RowPage, SqlDriver, TablePageRequest};
+use simpl_driver_trait::{
+    DriverErrorResponse, ExecuteResult, ExplainPlan, RowPage, SqlDriver, TablePageRequest,
+};
 use simpl_sql_utils::{split_statements, SqlDialectKind};
 use uuid::Uuid;
 
@@ -78,9 +80,7 @@ impl QueryEngine {
         connection_id: &Uuid,
     ) -> Result<simpl_driver_trait::SchemaMeta, DriverErrorResponse> {
         let meta = self.connections.introspect(connection_id).await?;
-        self.schema_cache
-            .set(*connection_id, meta.clone())
-            .await;
+        self.schema_cache.set(*connection_id, meta.clone()).await;
         Ok(meta)
     }
 
@@ -97,7 +97,10 @@ impl QueryEngine {
         self.refresh_schema(connection_id).await
     }
 
-    async fn dialect_for(&self, connection_id: &Uuid) -> Result<SqlDialectKind, DriverErrorResponse> {
+    async fn dialect_for(
+        &self,
+        connection_id: &Uuid,
+    ) -> Result<SqlDialectKind, DriverErrorResponse> {
         self.connections
             .with_driver(connection_id, |driver| {
                 Box::pin(async move { Ok(SqlDialectKind::from(driver.dialect())) })

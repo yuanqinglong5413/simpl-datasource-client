@@ -6,12 +6,33 @@ pub fn row_to_cells(row: &sqlx::postgres::PgRow) -> Vec<CellValue> {
 }
 
 fn pg_cell_at(row: &sqlx::postgres::PgRow, index: usize) -> CellValue {
-    if row.try_get::<Option<i32>, _>(index).ok().flatten().is_none()
-        && row.try_get::<Option<String>, _>(index).ok().flatten().is_none()
-        && row.try_get::<Option<bool>, _>(index).ok().flatten().is_none()
-        && row.try_get::<Option<i64>, _>(index).ok().flatten().is_none()
-        && row.try_get::<Option<f64>, _>(index).ok().flatten().is_none()
-        && row.try_get::<Option<serde_json::Value>, _>(index)
+    if row
+        .try_get::<Option<i32>, _>(index)
+        .ok()
+        .flatten()
+        .is_none()
+        && row
+            .try_get::<Option<String>, _>(index)
+            .ok()
+            .flatten()
+            .is_none()
+        && row
+            .try_get::<Option<bool>, _>(index)
+            .ok()
+            .flatten()
+            .is_none()
+        && row
+            .try_get::<Option<i64>, _>(index)
+            .ok()
+            .flatten()
+            .is_none()
+        && row
+            .try_get::<Option<f64>, _>(index)
+            .ok()
+            .flatten()
+            .is_none()
+        && row
+            .try_get::<Option<serde_json::Value>, _>(index)
             .ok()
             .flatten()
             .is_none()
@@ -23,25 +44,17 @@ fn pg_cell_at(row: &sqlx::postgres::PgRow, index: usize) -> CellValue {
         }
     }
 
-    if let Ok(v) = row.try_get::<Option<bool>, _>(index) {
-        if let Some(b) = v {
-            return CellValue::Bool(b);
-        }
+    if let Ok(Some(b)) = row.try_get::<Option<bool>, _>(index) {
+        return CellValue::Bool(b);
     }
-    if let Ok(v) = row.try_get::<Option<i64>, _>(index) {
-        if let Some(n) = v {
-            return CellValue::Int64(n);
-        }
+    if let Ok(Some(n)) = row.try_get::<Option<i64>, _>(index) {
+        return CellValue::Int64(n);
     }
-    if let Ok(v) = row.try_get::<Option<f64>, _>(index) {
-        if let Some(n) = v {
-            return CellValue::Float64(n);
-        }
+    if let Ok(Some(n)) = row.try_get::<Option<f64>, _>(index) {
+        return CellValue::Float64(n);
     }
-    if let Ok(v) = row.try_get::<Option<serde_json::Value>, _>(index) {
-        if let Some(json) = v {
-            return CellValue::Json(json);
-        }
+    if let Ok(Some(json)) = row.try_get::<Option<serde_json::Value>, _>(index) {
+        return CellValue::Json(json);
     }
     if let Ok(v) = row.try_get::<Option<String>, _>(index) {
         return match v {

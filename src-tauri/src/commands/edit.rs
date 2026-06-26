@@ -58,8 +58,5 @@ pub async fn get_transaction_status(
     state: State<'_, AppState>,
     connection_id: Uuid,
 ) -> Result<simpl_datasource_core::TransactionStatus, String> {
-    Ok(state
-        .connections
-        .transaction_status(&connection_id)
-        .await)
+    Ok(state.connections.transaction_status(&connection_id).await)
 }

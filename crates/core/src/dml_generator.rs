@@ -1,5 +1,5 @@
-use simpl_driver_trait::{CellValue, Dialect};
 use serde::{Deserialize, Serialize};
+use simpl_driver_trait::{CellValue, Dialect};
 use std::collections::HashMap;
 
 /// 单元格变更请求（内联编辑）。
@@ -30,7 +30,11 @@ pub fn generate_update(dialect: Dialect, change: &CellChangeRequest) -> Result<D
     }
 
     let table_ref = qualified_table(dialect, change.schema.as_deref(), &change.table);
-    let set_clause = format!("{} = {}", quote_ident(dialect, &change.column), sql_literal(&change.new_value));
+    let set_clause = format!(
+        "{} = {}",
+        quote_ident(dialect, &change.column),
+        sql_literal(&change.new_value)
+    );
     let where_clause = pk_where(dialect, &change.primary_key);
 
     Ok(DmlPreview {

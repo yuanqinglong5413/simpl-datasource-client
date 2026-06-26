@@ -53,8 +53,8 @@ impl ConnectionPersistence {
         let store = ConnectionStore {
             connections: connections.to_vec(),
         };
-        let json =
-            serde_json::to_string_pretty(&store).map_err(|e| PersistenceError::Write(e.to_string()))?;
+        let json = serde_json::to_string_pretty(&store)
+            .map_err(|e| PersistenceError::Write(e.to_string()))?;
         fs::write(self.file_path(), json).map_err(|e| PersistenceError::Write(e.to_string()))
     }
 

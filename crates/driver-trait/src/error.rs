@@ -53,7 +53,9 @@ pub struct DriverErrorResponse {
 impl From<&DriverError> for DriverErrorResponse {
     fn from(err: &DriverError) -> Self {
         let (code, detail) = match err {
-            DriverError::ConnectionFailed { message, .. } => ("connection_failed", Some(message.clone())),
+            DriverError::ConnectionFailed { message, .. } => {
+                ("connection_failed", Some(message.clone()))
+            }
             DriverError::QueryFailed { message, .. } => ("query_failed", Some(message.clone())),
             DriverError::Unsupported { .. } => ("unsupported", None),
             DriverError::InvalidConfig { .. } => ("invalid_config", None),

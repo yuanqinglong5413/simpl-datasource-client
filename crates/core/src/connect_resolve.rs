@@ -25,12 +25,7 @@ impl ResolvedConnection {
             });
         }
 
-        let tunnel = SshTunnel::connect(
-            &config.ssh,
-            secrets,
-            &config.host,
-            config.port,
-        )?;
+        let tunnel = SshTunnel::connect(&config.ssh, secrets, &config.host, config.port)?;
         Ok(Self {
             host: "127.0.0.1".to_string(),
             port: tunnel.local_port(),

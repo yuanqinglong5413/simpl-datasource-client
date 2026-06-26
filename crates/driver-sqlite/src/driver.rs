@@ -1,7 +1,7 @@
 use crate::convert::{columns_from_row, row_to_cells};
 use async_trait::async_trait;
 use simpl_driver_trait::{
-    ConnectionConfig, ConnectionSecrets, DatabaseKind, DriverError, Dialect, ExecuteResult,
+    ConnectionConfig, ConnectionSecrets, DatabaseKind, Dialect, DriverError, ExecuteResult,
     ExplainPlan, ExplainRow, RowPage, SchemaMeta, SqlDriver, TableMeta, TablePageRequest,
 };
 use sqlx::sqlite::{SqlitePool, SqlitePoolOptions, SqliteRow};
@@ -73,12 +73,11 @@ impl SqlDriver for SqliteDriver {
         let mut table_metas = Vec::new();
         for table in tables {
             let pragma = format!("PRAGMA table_info(\"{table}\")");
-            let columns = sqlx::query_as::<_, (i32, String, String, i32, Option<String>, i32)>(
-                &pragma,
-            )
-            .fetch_all(&self.pool)
-            .await
-            .map_err(Self::map_err)?;
+            let columns =
+                sqlx::query_as::<_, (i32, String, String, i32, Option<String>, i32)>(&pragma)
+                    .fetch_all(&self.pool)
+                    .await
+                    .map_err(Self::map_err)?;
 
             let pk: Vec<String> = columns
                 .iter()
@@ -88,14 +87,14 @@ impl SqlDriver for SqliteDriver {
 
             let col_meta = columns
                 .into_iter()
-                .map(|(_, name, data_type, notnull, _, pk_flag)| {
-                    simpl_driver_trait::ColumnMeta {
+                .map(
+                    |(_, name, data_type, notnull, _, pk_flag)| simpl_driver_trait::ColumnMeta {
                         name: name.clone(),
                         data_type,
                         nullable: notnull == 0,
                         is_primary_key: pk_flag == 1,
-                    }
-                })
+                    },
+                )
                 .collect();
 
             table_metas.push(TableMeta {
@@ -149,8 +148,7 @@ impl SqlDriver for SqliteDriver {
             .await
             .map_err(Self::map_err)?;
         let columns = rows.first().map(columns_from_row).unwrap_or_default();
-        let data: Vec<Vec<simpl_driver_trait::CellValue>> =
-            rows.iter().map(row_to_cells).collect();
+        let data: Vec<Vec<simpl_driver_trait::CellValue>> = rows.iter().map(row_to_cells).collect();
 
         Ok(ExecuteResult {
             columns,

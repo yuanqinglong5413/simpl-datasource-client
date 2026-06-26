@@ -67,7 +67,11 @@ impl QueryHistoryStore {
         store
             .entries
             .into_iter()
-            .filter(|e| connection_id.map(|id| e.connection_id == id).unwrap_or(true))
+            .filter(|e| {
+                connection_id
+                    .map(|id| e.connection_id == id)
+                    .unwrap_or(true)
+            })
             .take(limit)
             .collect()
     }
