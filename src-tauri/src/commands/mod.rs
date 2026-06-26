@@ -1,8 +1,12 @@
 mod connection;
+mod edit;
+mod import_export;
 mod query;
 mod schema;
 
 pub use connection::*;
+pub use edit::*;
+pub use import_export::*;
 pub use query::*;
 pub use schema::*;
 

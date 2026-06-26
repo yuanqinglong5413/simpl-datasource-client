@@ -17,6 +17,8 @@ impl MysqlDriver {
     pub async fn connect(
         config: &ConnectionConfig,
         secrets: &ConnectionSecrets,
+        host: &str,
+        port: u16,
     ) -> Result<Self, DriverError> {
         if config.kind != DatabaseKind::Mysql {
             return Err(DriverError::InvalidConfig {
@@ -28,8 +30,8 @@ impl MysqlDriver {
             "mysql://{}:{}@{}:{}/{}",
             urlencoding::encode(&config.username),
             urlencoding::encode(password),
-            config.host,
-            config.port,
+            host,
+            port,
             urlencoding::encode(&config.database)
         );
         let pool = MySqlPoolOptions::new()

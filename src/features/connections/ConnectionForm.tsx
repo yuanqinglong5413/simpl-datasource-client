@@ -13,6 +13,7 @@ export function ConnectionForm({ initial, onClose, onSaved }: Props) {
   const { t } = useTranslation("connections");
   const [config, setConfig] = useState(initial);
   const [password, setPassword] = useState("");
+  const [sshPassword, setSshPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -20,11 +21,18 @@ export function ConnectionForm({ initial, onClose, onSaved }: Props) {
     setConfig((c) => ({ ...c, [key]: value }));
   };
 
+  const updateSsh = <K extends keyof ConnectionConfig["ssh"]>(
+    key: K,
+    value: ConnectionConfig["ssh"][K],
+  ) => {
+    setConfig((c) => ({ ...c, ssh: { ...c.ssh, [key]: value } }));
+  };
+
   const handleTest = async () => {
     setBusy(true);
     setMessage(null);
     try {
-      await api.testConnection(config, password || undefined);
+      await api.testConnection(config, password || undefined, sshPassword || undefined);
       setMessage(t("testSuccess"));
     } catch (e) {
       setMessage(`${t("testFailed")}: ${e}`);
@@ -40,7 +48,7 @@ export function ConnectionForm({ initial, onClose, onSaved }: Props) {
     }
     setBusy(true);
     try {
-      await api.saveConnection(config, password || undefined);
+      await api.saveConnection(config, password || undefined, sshPassword || undefined);
       onSaved();
     } catch (e) {
       setMessage(String(e));
@@ -62,9 +70,11 @@ export function ConnectionForm({ initial, onClose, onSaved }: Props) {
     }
   };
 
+  const showSsh = config.kind !== "sqlite";
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal modal-wide" onClick={(e) => e.stopPropagation()}>
         <h2>{initial.name ? t("editConnection") : t("newConnection")}</h2>
         {message && <div className="error-banner">{message}</div>}
         <div className="form-grid">
@@ -108,6 +118,51 @@ export function ConnectionForm({ initial, onClose, onSaved }: Props) {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••"
               />
+            </>
+          )}
+
+          {showSsh && (
+            <>
+              <div className="form-section">{t("sshSection")}</div>
+              <label>{t("sshEnabled")}</label>
+              <input
+                type="checkbox"
+                checked={config.ssh.enabled}
+                onChange={(e) => updateSsh("enabled", e.target.checked)}
+              />
+              {config.ssh.enabled && (
+                <>
+                  <label>{t("sshHost")}</label>
+                  <input
+                    value={config.ssh.host}
+                    onChange={(e) => updateSsh("host", e.target.value)}
+                  />
+                  <label>{t("sshPort")}</label>
+                  <input
+                    type="number"
+                    value={config.ssh.port}
+                    onChange={(e) => updateSsh("port", Number(e.target.value))}
+                  />
+                  <label>{t("sshUsername")}</label>
+                  <input
+                    value={config.ssh.username}
+                    onChange={(e) => updateSsh("username", e.target.value)}
+                  />
+                  <label>{t("sshPrivateKey")}</label>
+                  <input
+                    value={config.ssh.private_key_path ?? ""}
+                    onChange={(e) => updateSsh("private_key_path", e.target.value || null)}
+                    placeholder="/home/user/.ssh/id_rsa"
+                  />
+                  <label>{t("sshPassword")}</label>
+                  <input
+                    type="password"
+                    value={sshPassword}
+                    onChange={(e) => setSshPassword(e.target.value)}
+                    placeholder="••••••"
+                  />
+                </>
+              )}
             </>
           )}
 

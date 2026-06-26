@@ -11,6 +11,8 @@ use simpl_driver_trait::{ConnectionConfig, ConnectionSecrets, DriverError};
 pub async fn connect(
     config: &ConnectionConfig,
     secrets: &ConnectionSecrets,
+    host: &str,
+    port: u16,
 ) -> Result<PostgresDriver, DriverError> {
-    PostgresDriver::connect(config, secrets).await
+    PostgresDriver::connect(config, secrets, host, port).await
 }

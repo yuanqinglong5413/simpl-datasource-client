@@ -16,6 +16,13 @@
   "deleteConfirm": "Delete this connection?",
   "testSuccess": "Connected",
   "testFailed": "Connection failed",
+  "sshSection": "SSH tunnel",
+  "sshEnabled": "Enable SSH",
+  "sshHost": "SSH host",
+  "sshPort": "SSH port",
+  "sshUsername": "SSH username",
+  "sshPrivateKey": "Private key path (optional)",
+  "sshPassword": "SSH password / key passphrase",
   "environments": {
     "dev": "Dev",
     "staging": "Staging",

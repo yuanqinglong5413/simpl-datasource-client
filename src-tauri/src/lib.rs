@@ -32,6 +32,16 @@ pub fn run() {
             commands::execute_sql,
             commands::fetch_table_page,
             commands::list_query_history,
+            commands::preview_cell_change,
+            commands::queue_cell_change,
+            commands::commit_transaction,
+            commands::rollback_transaction,
+            commands::get_transaction_status,
+            commands::export_data,
+            commands::import_preview,
+            commands::import_execute,
+            commands::pick_save_file,
+            commands::pick_open_file,
         ])
         .run(tauri::generate_context!())
         .expect("failed to run 简源 application");

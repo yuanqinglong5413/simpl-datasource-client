@@ -16,6 +16,13 @@
   "deleteConfirm": "确定删除此连接？",
   "testSuccess": "连接成功",
   "testFailed": "连接失败",
+  "sshSection": "SSH 隧道",
+  "sshEnabled": "启用 SSH",
+  "sshHost": "SSH 主机",
+  "sshPort": "SSH 端口",
+  "sshUsername": "SSH 用户名",
+  "sshPrivateKey": "私钥路径（可选）",
+  "sshPassword": "SSH 密码 / 私钥口令",
   "environments": {
     "dev": "开发",
     "staging": "预发",

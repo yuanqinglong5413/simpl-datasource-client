@@ -18,6 +18,8 @@ impl PostgresDriver {
     pub async fn connect(
         config: &ConnectionConfig,
         secrets: &ConnectionSecrets,
+        host: &str,
+        port: u16,
     ) -> Result<Self, DriverError> {
         if config.kind != DatabaseKind::Postgres {
             return Err(DriverError::InvalidConfig {
@@ -29,8 +31,8 @@ impl PostgresDriver {
             "postgres://{}:{}@{}:{}/{}",
             urlencoding_encode(&config.username),
             urlencoding_encode(password),
-            config.host,
-            config.port,
+            host,
+            port,
             urlencoding_encode(&config.database)
         );
         let pool = PgPoolOptions::new()

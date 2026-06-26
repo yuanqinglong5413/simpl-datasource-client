@@ -1,0 +1,16 @@
+[package]
+name = "simpl-ssh"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "简源 — SSH 本地端口转发隧道"
+
+[dependencies]
+simpl-driver-trait = { path = "../driver-trait" }
+ssh2 = "0.9"
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile = "3"

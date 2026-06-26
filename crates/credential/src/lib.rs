@@ -59,25 +59,75 @@ impl CredentialStore {
         format!("conn-{connection_id}")
     }
 
-    /// 保存连接密码等敏感字段。
+    fn ssh_keyring_key(connection_id: &Uuid) -> String {
+        format!("ssh-{connection_id}")
+    }
+
+    /// 保存数据库连接密码。
     pub fn store_secret(&self, connection_id: &Uuid, secret: &str) -> Result<(), CredentialError> {
+        self.store_with_key(
+            &Self::keyring_key(connection_id),
+            connection_id,
+            secret,
+            false,
+        )
+    }
+
+    /// 保存 SSH 密码。
+    pub fn store_ssh_secret(&self, connection_id: &Uuid, secret: &str) -> Result<(), CredentialError> {
+        self.store_with_key(
+            &Self::ssh_keyring_key(connection_id),
+            connection_id,
+            secret,
+            true,
+        )
+    }
+
+    fn store_with_key(
+        &self,
+        keyring_key: &str,
+        storage_key: &Uuid,
+        secret: &str,
+        ssh: bool,
+    ) -> Result<(), CredentialError> {
         if self.keyring_available {
-            if let Ok(entry) = keyring::Entry::new(SERVICE_NAME, &Self::keyring_key(connection_id))
-            {
+            if let Ok(entry) = keyring::Entry::new(SERVICE_NAME, keyring_key) {
                 entry
                     .set_password(secret)
                     .map_err(|e| CredentialError::Write(e.to_string()))?;
                 return Ok(());
             }
         }
-        self.store_encrypted(connection_id, secret)
+        let map_key = if ssh {
+            Self::ssh_keyring_key(storage_key)
+        } else {
+            storage_key.to_string()
+        };
+        self.store_encrypted_by_key(&map_key, secret)
     }
 
-    /// 读取敏感字段。
+    /// 读取数据库连接密码。
     pub fn get_secret(&self, connection_id: &Uuid) -> Result<Option<String>, CredentialError> {
+        self.get_with_key(&Self::keyring_key(connection_id), connection_id, false)
+    }
+
+    /// 读取 SSH 密码。
+    pub fn get_ssh_secret(&self, connection_id: &Uuid) -> Result<Option<String>, CredentialError> {
+        self.get_with_key(
+            &Self::ssh_keyring_key(connection_id),
+            connection_id,
+            true,
+        )
+    }
+
+    fn get_with_key(
+        &self,
+        keyring_key: &str,
+        storage_key: &Uuid,
+        ssh: bool,
+    ) -> Result<Option<String>, CredentialError> {
         if self.keyring_available {
-            if let Ok(entry) = keyring::Entry::new(SERVICE_NAME, &Self::keyring_key(connection_id))
-            {
+            if let Ok(entry) = keyring::Entry::new(SERVICE_NAME, keyring_key) {
                 match entry.get_password() {
                     Ok(value) => return Ok(Some(value)),
                     Err(keyring::Error::NoEntry) => {}
@@ -85,19 +135,46 @@ impl CredentialStore {
                 }
             }
         }
-        self.load_encrypted(connection_id)
+        let map_key = if ssh {
+            Self::ssh_keyring_key(storage_key)
+        } else {
+            storage_key.to_string()
+        };
+        self.load_encrypted_by_key(&map_key)
     }
 
-    /// 删除敏感字段。
+    /// 删除数据库连接密码。
     pub fn delete_secret(&self, connection_id: &Uuid) -> Result<(), CredentialError> {
+        self.delete_with_key(&Self::keyring_key(connection_id), connection_id, false)
+    }
+
+    /// 删除 SSH 密码。
+    pub fn delete_ssh_secret(&self, connection_id: &Uuid) -> Result<(), CredentialError> {
+        self.delete_with_key(
+            &Self::ssh_keyring_key(connection_id),
+            connection_id,
+            true,
+        )
+    }
+
+    fn delete_with_key(
+        &self,
+        keyring_key: &str,
+        storage_key: &Uuid,
+        ssh: bool,
+    ) -> Result<(), CredentialError> {
         if self.keyring_available {
-            if let Ok(entry) = keyring::Entry::new(SERVICE_NAME, &Self::keyring_key(connection_id))
-            {
+            if let Ok(entry) = keyring::Entry::new(SERVICE_NAME, keyring_key) {
                 let _ = entry.delete_credential();
             }
         }
+        let map_key = if ssh {
+            Self::ssh_keyring_key(storage_key)
+        } else {
+            storage_key.to_string()
+        };
         let mut payload = self.load_all_encrypted()?;
-        payload.entries.remove(&connection_id.to_string());
+        payload.entries.remove(&map_key);
         self.save_all_encrypted(&payload)
     }
 
@@ -161,17 +238,15 @@ impl CredentialStore {
         fs::write(self.secrets_path(), json).map_err(|e| CredentialError::Write(e.to_string()))
     }
 
-    fn store_encrypted(&self, connection_id: &Uuid, secret: &str) -> Result<(), CredentialError> {
+    fn store_encrypted_by_key(&self, key: &str, secret: &str) -> Result<(), CredentialError> {
         let mut payload = self.load_all_encrypted()?;
-        payload
-            .entries
-            .insert(connection_id.to_string(), secret.to_string());
+        payload.entries.insert(key.to_string(), secret.to_string());
         self.save_all_encrypted(&payload)
     }
 
-    fn load_encrypted(&self, connection_id: &Uuid) -> Result<Option<String>, CredentialError> {
+    fn load_encrypted_by_key(&self, key: &str) -> Result<Option<String>, CredentialError> {
         let payload = self.load_all_encrypted()?;
-        Ok(payload.entries.get(&connection_id.to_string()).cloned())
+        Ok(payload.entries.get(key).cloned())
     }
 }
 

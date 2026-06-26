@@ -15,21 +15,21 @@ pub enum ActiveDriver {
 }
 
 impl ActiveDriver {
-    /// 根据连接配置创建并连接驱动。
+    /// 根据连接配置创建并连接驱动（host/port 已由 SSH 解析层处理）。
     pub async fn connect(
         config: &ConnectionConfig,
         secrets: &ConnectionSecrets,
+        host: &str,
+        port: u16,
     ) -> Result<Self, DriverError> {
         match config.kind {
-            DatabaseKind::Postgres => {
-                Ok(Self::Postgres(PostgresDriver::connect(config, secrets).await?))
-            }
-            DatabaseKind::Mysql => {
-                Ok(Self::Mysql(MysqlDriver::connect(config, secrets).await?))
-            }
-            DatabaseKind::Sqlite => {
-                Ok(Self::Sqlite(SqliteDriver::connect(config, secrets).await?))
-            }
+            DatabaseKind::Postgres => Ok(Self::Postgres(
+                PostgresDriver::connect(config, secrets, host, port).await?,
+            )),
+            DatabaseKind::Mysql => Ok(Self::Mysql(
+                MysqlDriver::connect(config, secrets, host, port).await?,
+            )),
+            DatabaseKind::Sqlite => Ok(Self::Sqlite(SqliteDriver::connect(config, secrets).await?)),
         }
     }
 }

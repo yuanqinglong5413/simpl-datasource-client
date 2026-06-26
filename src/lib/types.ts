@@ -90,6 +90,74 @@ export interface AppInfo {
   data_dir: string;
 }
 
+export interface DmlPreview {
+  sql: string;
+  operation: string;
+}
+
+export interface TransactionStatus {
+  active: boolean;
+  pending_count: number;
+}
+
+export type ExportFormat = "csv" | "json" | "jsonl" | "sql" | "xlsx";
+
+export interface ExportResult {
+  rows_written: number;
+  file_path: string;
+}
+
+export type ImportFileFormat = "csv" | "json";
+
+export interface ImportPreview {
+  headers: string[];
+  sample_rows: string[][];
+  suggested_mapping: Record<string, string>;
+}
+
+export interface ImportRequest {
+  file_path: string;
+  schema?: string | null;
+  table: string;
+  mapping: { column_map: Record<string, string> };
+  format: ImportFileFormat;
+}
+
+export interface ImportResult {
+  rows_imported: number;
+  insert_statements: string[];
+}
+
+export interface CellChangeRequest {
+  schema?: string | null;
+  table: string;
+  primary_key: Record<string, CellValue>;
+  column: string;
+  old_value: CellValue;
+  new_value: CellValue;
+}
+
+export function parseCellInput(text: string, sample: CellValue): CellValue {
+  const trimmed = text.trim();
+  if (trimmed.toUpperCase() === "NULL" || trimmed === "") {
+    return { type: "Null" };
+  }
+  switch (sample.type) {
+    case "Bool":
+      return { type: "Bool", value: trimmed === "true" || trimmed === "1" };
+    case "Int64": {
+      const n = Number(trimmed);
+      return Number.isFinite(n) ? { type: "Int64", value: n } : { type: "String", value: trimmed };
+    }
+    case "Float64": {
+      const n = Number(trimmed);
+      return Number.isFinite(n) ? { type: "Float64", value: n } : { type: "String", value: trimmed };
+    }
+    default:
+      return { type: "String", value: trimmed };
+  }
+}
+
 export function formatCell(cell: CellValue): string {
   switch (cell.type) {
     case "Null":

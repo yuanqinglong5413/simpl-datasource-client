@@ -335,3 +335,104 @@ textarea {
   flex: 1;
   min-height: 0;
 }
+
+.modal-wide {
+  max-width: 640px;
+  width: 92vw;
+}
+
+.form-section {
+  grid-column: 1 / -1;
+  font-weight: 600;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.grid-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding: 4px 8px;
+  gap: 8px;
+}
+
+.grid-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.transaction-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(59, 130, 246, 0.12);
+  border-bottom: 1px solid var(--accent);
+  font-size: 13px;
+}
+
+.transaction-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.editable-cell {
+  cursor: text;
+}
+
+.editable-cell:hover {
+  background: var(--bg-hover);
+}
+
+.cell-editor {
+  width: 100%;
+  min-width: 80px;
+  padding: 2px 4px;
+}
+
+.sql-preview {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  overflow: auto;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+.mapping-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mapping-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.info-banner {
+  padding: 8px 12px;
+  background: rgba(139, 156, 179, 0.15);
+  color: var(--text-muted);
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.success-banner {
+  padding: 8px 12px;
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.text-muted {
+  color: var(--text-muted);
+  font-size: 13px;
+}

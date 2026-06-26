@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "crates/driver-trait",
     "crates/credential",
+    "crates/ssh",
     "crates/sql-utils",
     "crates/driver-postgres",
     "crates/driver-mysql",

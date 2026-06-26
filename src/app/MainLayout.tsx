@@ -4,8 +4,9 @@ import { ConnectionList } from "@/features/connections/ConnectionList";
 import { SchemaTree } from "@/features/schema/SchemaTree";
 import { SqlEditor } from "@/features/editor/SqlEditor";
 import { DataGrid } from "@/features/grid/DataGrid";
+import { ImportDialog } from "@/features/grid/ImportDialog";
 import { api } from "@/lib/api";
-import type { AppInfo, ConnectionRecord, RowPage, TableMeta } from "@/lib/types";
+import type { AppInfo, ConnectionRecord, ImportFileFormat, RowPage, TableMeta } from "@/lib/types";
 
 type MainTab = "editor" | "data";
 
@@ -18,6 +19,10 @@ export function MainLayout() {
   const [tablePage, setTablePage] = useState<RowPage | null>(null);
   const [tableLoading, setTableLoading] = useState(false);
   const [selectedTable, setSelectedTable] = useState<TableMeta | null>(null);
+  const [importState, setImportState] = useState<{
+    filePath: string;
+    format: ImportFileFormat;
+  } | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -54,6 +59,32 @@ export function MainLayout() {
     },
     [selected],
   );
+
+  const refreshTable = useCallback(async () => {
+    if (!selectedTable || !selected?.connected) return;
+    setTableLoading(true);
+    try {
+      const page = await api.fetchTablePage(selected.config.id, {
+        schema: selectedTable.schema,
+        table: selectedTable.name,
+        offset: tablePage?.offset ?? 0,
+        limit: tablePage?.limit ?? 200,
+      });
+      setTablePage(page);
+    } catch (e) {
+      alert(String(e));
+    } finally {
+      setTableLoading(false);
+    }
+  }, [selected, selectedTable, tablePage]);
+
+  const handleImport = async () => {
+    if (!selected?.connected || !selectedTable) return;
+    const path = await api.pickOpenFile();
+    if (!path) return;
+    const format: ImportFileFormat = path.toLowerCase().endsWith(".json") ? "json" : "csv";
+    setImportState({ filePath: path, format });
+  };
 
   return (
     <div className="app-shell">
@@ -113,10 +144,29 @@ export function MainLayout() {
               page={tablePage}
               loading={tableLoading}
               title={selectedTable ? `${selectedTable.schema}.${selectedTable.name}` : undefined}
+              connectionId={selected?.config.id ?? null}
+              table={selectedTable}
+              readOnly={selected?.config.read_only}
+              onRefresh={() => void refreshTable()}
+              onImport={selectedTable && !selected?.config.read_only ? () => void handleImport() : undefined}
             />
           )}
         </main>
       </div>
+
+      {importState && selected?.connected && selectedTable && (
+        <ImportDialog
+          connectionId={selected.config.id}
+          table={selectedTable}
+          filePath={importState.filePath}
+          format={importState.format}
+          onClose={() => setImportState(null)}
+          onDone={() => {
+            setImportState(null);
+            void refreshTable();
+          }}
+        />
+      )}
     </div>
   );
 }
