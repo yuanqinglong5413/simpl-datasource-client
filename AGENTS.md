@@ -20,3 +20,7 @@
 - `crates/driver-*` — PG / MySQL / SQLite 驱动
 - `src-tauri` — Tauri IPC
 - `src/` — React 前端
+
+### 发布
+- 推送 `v*` tag（如 `v0.1.0`）会触发 `.github/workflows/release.yml`，自动构建多平台安装包并创建 GitHub Release。
+- 为已有 tag 补发 Release：GitHub Actions → Release → Run workflow，填写 tag 名称。

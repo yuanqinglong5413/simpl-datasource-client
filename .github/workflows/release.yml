@@ -1,0 +1,97 @@
+# 推送 v* tag 时自动构建 Tauri 安装包并创建 GitHub Release。
+# 也可在 Actions 页手动运行（workflow_dispatch），为已有 tag 补发 Release。
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "已有 tag 名称（如 v0.1.0）"
+        required: true
+        default: "v0.1.0"
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            args: --target aarch64-apple-darwin
+          - platform: macos-latest
+            args: --target x86_64-apple-darwin
+          - platform: ubuntu-22.04
+            args: ""
+          - platform: windows-latest
+            args: ""
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Resolve release tag
+        id: meta
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.meta.outputs.tag }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libssl-dev pkg-config patchelf \
+            libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # 与 Cargo.toml / package.json 版本对齐，生成 v0.1.0 等 tag
+          tagName: v__VERSION__
+          releaseName: "简源 SimplSource v__VERSION__"
+          releaseBody: |
+            ## 简源 SimplSource v__VERSION__
+
+            轻量数据库客户端（Tauri 2 + React + Rust）。
+
+            ### 下载
+            请根据操作系统选择对应安装包（`.deb` / `.AppImage` / `.msi` / `.dmg` 等）。
+
+            ### 功能
+            - PostgreSQL / MySQL / SQLite 连接与管理
+            - SQL 编辑器与数据浏览
+            - SSH 隧道
+            - 内联编辑（Safe Mode 事务）
+            - CSV / JSON / JSONL / SQL / XLSX 导出，CSV / JSON 导入
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}
