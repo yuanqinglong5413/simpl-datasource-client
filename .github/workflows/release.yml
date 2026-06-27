@@ -73,8 +73,7 @@ jobs:
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # 配置 Apple 开发者证书后可自动签名 + 公证，macOS 不再提示「已损坏」
-          # 见 https://tauri.app/distribute/sign/macos/
+          # 配置 Apple 开发者证书后可自动签名 + 公证（会覆盖 tauri.conf 中的 ad-hoc "-"）
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
@@ -98,17 +97,15 @@ jobs:
             | Linux | `.deb` / `.AppImage` |
 
             ### macOS 安装提示（重要）
-            当前版本**尚未 Apple 公证**，首次打开可能提示 **「已损坏，无法打开」**，这是 Gatekeeper 拦截未签名应用，**不是文件损坏**。
+            GitHub Actions 构建的包已启用 **ad-hoc 签名**。若仍提示「已损坏」，在终端执行：
 
-            **方法一（推荐）**：终端执行（把路径改成你的 `.app` 实际位置）：
             ```bash
             xattr -cr /Applications/simplsource.app
+            codesign --force --deep --sign - /Applications/simplsource.app
             open /Applications/simplsource.app
             ```
 
-            **方法二**：右键点击 `simplsource.app` → **打开** → 确认打开（仅首次需要）。
-
-            **方法三**：系统设置 → 隐私与安全性 → 仍要打开。
+            Apple Silicon 请下载 `*_aarch64.dmg`，Intel Mac 请下载 `*_x64.dmg`。
 
             ### 功能
             - PostgreSQL / MySQL / SQLite 连接与管理
