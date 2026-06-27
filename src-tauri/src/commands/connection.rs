@@ -56,13 +56,12 @@ pub async fn connect_database(
     state: State<'_, AppState>,
     id: Uuid,
 ) -> Result<ConnectionConfig, String> {
-    let config = state
+    // 仅建立驱动连接；Schema 由前端 SchemaTree 异步拉取，避免连接按钮长时间无响应
+    state
         .connections
         .connect(&id)
         .await
-        .map_err(|e| e.user_message)?;
-    let _ = state.query_engine.refresh_schema(&id).await;
-    Ok(config)
+        .map_err(|e| e.user_message)
 }
 
 #[tauri::command]

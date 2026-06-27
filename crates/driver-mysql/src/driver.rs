@@ -6,7 +6,7 @@ use simpl_driver_trait::{
 };
 use sqlx::mysql::{MySqlPool, MySqlPoolOptions, MySqlRow};
 use sqlx::{Column, Row};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 pub struct MysqlDriver {
     pool: MySqlPool,
@@ -27,7 +27,7 @@ impl MysqlDriver {
         }
         let password = secrets.password.as_deref().unwrap_or("");
         let url = format!(
-            "mysql://{}:{}@{}:{}/{}",
+            "mysql://{}:{}@{}:{}/{}?connect_timeout=10",
             urlencoding::encode(&config.username),
             urlencoding::encode(password),
             host,
@@ -36,6 +36,8 @@ impl MysqlDriver {
         );
         let pool = MySqlPoolOptions::new()
             .max_connections(5)
+            .acquire_timeout(Duration::from_secs(10))
+            .idle_timeout(Duration::from_secs(600))
             .connect(&url)
             .await
             .map_err(|e| DriverError::ConnectionFailed {

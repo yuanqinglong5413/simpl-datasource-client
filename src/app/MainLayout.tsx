@@ -104,7 +104,8 @@ export function MainLayout() {
           <ConnectionList
             selectedId={selected?.config.id ?? null}
             onSelect={setSelected}
-            onConnected={(r) => setSelected({ ...r, connected: true })}
+            onConnected={(r) => setSelected(r)}
+            onDisconnected={(r) => setSelected((prev) => (prev?.config.id === r.config.id ? r : prev))}
           />
         </aside>
         <aside className="sidebar" style={{ width: 260 }}>

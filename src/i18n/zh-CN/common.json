@@ -12,6 +12,7 @@
   "execute": "执行",
   "connect": "连接",
   "disconnect": "断开",
+  "connecting": "连接中…",
   "loading": "加载中…",
   "error": "错误",
   "rows": "行",

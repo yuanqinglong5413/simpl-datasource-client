@@ -189,6 +189,15 @@ impl ConnectionManager {
             detail: None,
         })?;
         let secrets = self.build_secrets(&config, None, None);
+        if config.kind != simpl_driver_trait::DatabaseKind::Sqlite
+            && secrets.password.as_ref().is_none_or(|p| p.is_empty())
+        {
+            return Err(DriverErrorResponse {
+                code: "missing_password".into(),
+                user_message: "未保存数据库密码，请编辑连接重新填写密码并保存".into(),
+                detail: None,
+            });
+        }
         let conn = self.open_driver(&config, &secrets).await?;
         conn.driver
             .test_connection()

@@ -12,6 +12,7 @@
   "execute": "Run",
   "connect": "Connect",
   "disconnect": "Disconnect",
+  "connecting": "Connecting…",
   "loading": "Loading…",
   "error": "Error",
   "rows": "rows",
